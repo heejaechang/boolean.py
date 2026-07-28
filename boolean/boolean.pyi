@@ -1,14 +1,17 @@
 import inspect as inspect
 import itertools as itertools
-from collections.abc import Callable, Container, Iterable, Iterator, Mapping
+from collections.abc import Callable, Container, Hashable, Iterable, Iterator, Mapping
 from functools import reduce as reduce
 from operator import and_ as and_operator
 from operator import or_ as or_operator
-from typing import ClassVar, TypeVar
+from typing import ClassVar, TypeAlias, TypeVar
 
 import boolean.boolean as _boolean
 
 _ValueT = TypeVar("_ValueT")
+_Token: TypeAlias = tuple[int | Symbol, str, object]
+_Ast: TypeAlias = list[_Ast | type[Function] | Expression | int | None]
+_Precedence: TypeAlias = Mapping[type[Function] | int, int]
 
 TRACE_PARSE: bool
 
@@ -75,18 +78,16 @@ class BooleanAlgebra:
     def symbols(self, *args: object) -> tuple[_boolean.Symbol, ...]: ...
     def parse(
         self,
-        expr: str | Iterable[tuple[int | _boolean.Symbol, str, object]],
+        expr: str | Iterable[_Token],
         simplify: bool = False,
     ) -> Expression: ...
     def _start_operation(
         self,
-        ast: list[object],
+        ast: _Ast,
         operation: type[Function],
-        precedence: Mapping[object, int],
-    ) -> list[object]: ...
-    def tokenize(
-        self, expr: str
-    ) -> Iterator[tuple[int | _boolean.Symbol, str, object]]: ...
+        precedence: _Precedence,
+    ) -> _Ast: ...
+    def tokenize(self, expr: str) -> Iterator[_Token]: ...
     def _recurse_distributive(
         self, expr: Expression, operation_inst: DualBase
     ) -> Expression: ...
@@ -113,7 +114,7 @@ class Expression:
     iscanonical: bool
     def __init__(self) -> None: ...
     @property
-    def objects(self) -> set[object]: ...
+    def objects(self) -> set[Hashable]: ...
     def get_literals(self) -> list[Expression]: ...
     @property
     def literals(self) -> set[Expression]: ...
