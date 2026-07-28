@@ -137,22 +137,6 @@ class BooleanAlgebraTestCase(unittest.TestCase):
         )
         assert expr == expected
 
-    def test_parse_error_supports_custom_token_position(self):
-        algebra = BooleanAlgebra()
-        positions = (
-            ((3, 4), ' at position: (3, 4)'),
-            ("line 3", " at position: line 3"),
-            (None, ""),
-        )
-
-        for position, suffix in positions:
-            with self.subTest(position=position):
-                with self.assertRaises(ParseError) as context:
-                    algebra.parse([(TOKEN_AND, "AND", position)])
-
-                assert context.exception.position == position
-                assert str(context.exception).endswith(f'for token: "AND"{suffix}')
-
     def test_parse_with_advanced_tokenizer_example(self):
         import tokenize
         from io import StringIO

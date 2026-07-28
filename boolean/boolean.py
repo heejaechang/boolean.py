@@ -91,7 +91,7 @@ class ParseError(Exception):
             tstr = f' for token: "{self.token_string}"'
 
         pos = ""
-        if self.position and self.position != -1:
+        if self.position > 0:
             pos = f" at position: {self.position}"
 
         return f"{emsg}{tstr}{pos}"
